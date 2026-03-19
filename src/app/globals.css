@@ -1,3 +1,10 @@
+@import url('https://rsms.me/inter/inter.css');
+@import "@radix-ui/colors/gray.css";
+@import "@radix-ui/colors/blue.css";
+@import "@radix-ui/colors/green.css";
+@import "@radix-ui/colors/amber.css";
+@import "@radix-ui/colors/iris.css";
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -45,6 +52,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Radix custom mappings for the app */
+  --color-success: var(--green-9);
+  --color-success-bg: var(--green-3);
+  --color-success-text: var(--green-11);
+  --color-calendar-today: var(--blue-2);
+  --color-border-light: var(--gray-6);
 }
 
 :root {
@@ -125,5 +139,12 @@
   }
   html {
     @apply font-sans;
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: "tnum" 1;
+  }
+  @supports (font-variation-settings: normal) {
+    html {
+      font-family: 'Inter var', sans-serif;
+    }
   }
 }
