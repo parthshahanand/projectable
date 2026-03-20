@@ -3,6 +3,13 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Project, Report } from '@/types';
 import { supabase } from './supabase';
+import { toast } from 'sonner';
+
+interface CreateProjectOptions {
+  reportCount: number;
+  name?: string;
+  dueDate?: string | null;
+}
 
 interface DataContextType {
   projects: Project[];
@@ -14,6 +21,7 @@ interface DataContextType {
   updateReport: (id: string, updates: Partial<Report>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   deleteReport: (id: string) => Promise<void>;
+  createProject: (options: CreateProjectOptions) => Promise<Project | null>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -81,35 +89,74 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [projects]);
 
   const updateProject = async (id: string, updates: Partial<Project>) => {
-    // Optimistic update
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    const prev = projects;
+    setProjects(p => p.map(proj => proj.id === id ? { ...proj, ...updates } : proj));
     const { error } = await supabase.from('projects').update(updates).eq('id', id);
     if (error) {
-      // Revert on error? For now, the Realtime listener will eventually correct it if we fetch again, 
-      // but a proper revert would be better. However, let's keep it simple as requested.
-      console.error('Update project error:', error);
+      setProjects(prev);
+      toast.error('Failed to update project');
     }
   };
 
   const updateReport = async (id: string, updates: Partial<Report>) => {
-    // Optimistic update
-    setReports(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+    const prev = reports;
+    setReports(r => r.map(rep => rep.id === id ? { ...rep, ...updates } : rep));
     const { error } = await supabase.from('reports').update(updates).eq('id', id);
     if (error) {
-      console.error('Update report error:', error);
+      setReports(prev);
+      toast.error('Failed to update report');
     }
   };
 
   const deleteProject = async (id: string) => {
-    await supabase.from('projects').delete().eq('id', id);
+    const prev = projects;
+    setProjects(p => p.filter(proj => proj.id !== id));
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) {
+      setProjects(prev);
+      toast.error('Failed to delete project');
+    }
   };
 
   const deleteReport = async (id: string) => {
-    await supabase.from('reports').delete().eq('id', id);
+    const prev = reports;
+    setReports(r => r.filter(rep => rep.id !== id));
+    const { error } = await supabase.from('reports').delete().eq('id', id);
+    if (error) {
+      setReports(prev);
+      toast.error('Failed to delete report');
+    }
+  };
+
+  const createProject = async ({ reportCount, name, dueDate }: CreateProjectOptions): Promise<Project | null> => {
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .insert({})
+      .select('id')
+      .single();
+
+    if (projectError || !project) {
+      toast.error('Failed to create project');
+      return null;
+    }
+
+    const reportsToInsert = Array.from({ length: reportCount }).map((_, i) => ({
+      project_id: project.id,
+      name: i === 0 && name ? name.trim() : `Report ${i + 1}`,
+      due_date: i === 0 && dueDate ? dueDate : null,
+      order: i,
+    }));
+
+    const { error: reportError } = await supabase.from('reports').insert(reportsToInsert);
+    if (reportError) {
+      toast.error('Project created but failed to add reports');
+    }
+
+    return project as Project;
   };
 
   return (
-    <DataContext.Provider value={{ projects, reports, allOwners, allAccounts, isLoading, updateProject, updateReport, deleteProject, deleteReport }}>
+    <DataContext.Provider value={{ projects, reports, allOwners, allAccounts, isLoading, updateProject, updateReport, deleteProject, deleteReport, createProject }}>
       {children}
     </DataContext.Provider>
   );

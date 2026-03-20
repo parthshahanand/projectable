@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useData } from '@/lib/data-context';
 
 export function NewReportDialog() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createProject } = useData();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,32 +18,19 @@ export function NewReportDialog() {
 
     setIsSubmitting(true);
     
-    // Create project
-    const { data: projectData, error: projectError } = await supabase
-      .from('projects')
-      .insert({})
-      .select('id')
-      .single();
+    const project = await createProject({ reportCount: num });
 
-    if (projectData && !projectError) {
-      // Create reports
-      const reportsToInsert = Array.from({ length: num }).map((_, i) => ({
-        project_id: projectData.id,
-        name: `Report ${i + 1}`,
-        order: i
-      }));
-
-      await supabase.from('reports').insert(reportsToInsert);
+    if (project) {
+      setOpen(false);
+      setCount('1');
+      
+      // Smooth scroll to bottom after briefly waiting for Realtime sync
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }, 500);
     }
     
     setIsSubmitting(false);
-    setOpen(false);
-    setCount('1');
-    
-    // Smooth scroll to bottom after briefly waiting for Realtime sync
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 500);
   };
 
   return (
@@ -56,6 +44,7 @@ export function NewReportDialog() {
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Project</DialogTitle>
+            <DialogDescription className="hidden">Create a new project and specify the number of reports.</DialogDescription>
           </DialogHeader>
           <div className="py-6">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed mb-3 block">
