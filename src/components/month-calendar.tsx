@@ -83,7 +83,7 @@ export function MonthCalendar() {
         </button>
       </div>
       
-      <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative pr-4 custom-scrollbar">
+      <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative pr-4">
         <div className="grid grid-cols-7 w-full h-max border-t border-l border-border-light auto-rows-[minmax(120px,1fr)]">
           {/* Header row for days of week */}
           <div className="col-span-7 grid grid-cols-7 sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">

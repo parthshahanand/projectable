@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { DataProvider } from '@/lib/data-context';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'Reporting + Analytics Coverage',
@@ -18,6 +19,7 @@ export default function RootLayout({
         <DataProvider>
           {children}
         </DataProvider>
+        <Toaster richColors position="bottom-right" />
       </body>
     </html>
   );

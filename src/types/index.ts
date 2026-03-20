@@ -18,6 +18,4 @@ export interface Report {
   created_at: string;
 }
 
-// Omit id and created_at for insert structures
-export type InsertProject = Omit<Project, 'id' | 'created_at'>;
-export type InsertReport = Omit<Report, 'id' | 'created_at'>;
+

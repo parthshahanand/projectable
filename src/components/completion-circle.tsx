@@ -1,12 +1,14 @@
 import React from 'react';
 import { Circle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
+import { useData } from '@/lib/data-context';
 import { Report } from '@/types';
 
 export function CompletionCircle({ report, className }: { report: Report; className?: string }) {
+  const { updateReport } = useData();
+
   const toggleComplete = async () => {
-    await supabase.from('reports').update({ completed: !report.completed }).eq('id', report.id);
+    await updateReport(report.id, { completed: !report.completed });
   };
 
   return (

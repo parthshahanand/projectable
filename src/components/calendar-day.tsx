@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { Report } from '@/types';
 import { CalendarBadge } from './calendar-badge';
-import { supabase } from '@/lib/supabase';
+import { useData } from '@/lib/data-context';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -22,6 +22,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
   const [showCountDialog, setShowCountDialog] = useState(false);
   const [reportCount, setReportCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createProject } = useData();
 
   const handleInlineSubmit = () => {
     if (!newReportName.trim()) {
@@ -39,23 +40,19 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
 
     setIsSubmitting(true);
 
-    const { data: project } = await supabase.from('projects').insert({}).select('id').single();
-    
+    const project = await createProject({
+      reportCount: num,
+      name: newReportName,
+      dueDate: date.format('YYYY-MM-DD'),
+    });
+
     if (project) {
-      const reportsToInsert = Array.from({ length: num }).map((_, i) => ({
-        project_id: project.id,
-        name: i === 0 ? newReportName.trim() : `Report ${i + 1}`,
-        due_date: i === 0 ? date.format('YYYY-MM-DD') : null,
-        order: i
-      }));
-
-      await supabase.from('reports').insert(reportsToInsert);
+      setNewReportName('');
+      setIsAdding(false);
+      setShowCountDialog(false);
+      setReportCount('1');
     }
-
-    setNewReportName('');
-    setIsAdding(false);
-    setShowCountDialog(false);
-    setReportCount('1');
+    
     setIsSubmitting(false);
   };
 
@@ -142,6 +139,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
           <form onSubmit={handleCreateProject}>
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
+              <DialogDescription className="hidden">Create a new inline project and specify the number of reports.</DialogDescription>
             </DialogHeader>
             <div className="py-6">
               <label className="text-sm font-medium leading-none mb-3 block">
