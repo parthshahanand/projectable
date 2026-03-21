@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, X } from 'lucide-react';
+import { formatDisplay, formatHref } from '@/lib/format-link';
 
 interface LinkBadgeInputProps {
   links: string[];
@@ -26,27 +27,6 @@ export function LinkBadgeInput({ links, onChange, placeholder }: LinkBadgeInputP
   const removeLink = (linkToRemove: string) => {
     onChange(links.filter(l => l !== linkToRemove));
   };
-  
-  // Clean up URL for display (e.g., 'docs.google.com')
-  const formatDisplay = (url: string) => {
-    try {
-      const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-      const host = urlObj.hostname.replace('www.', '');
-      
-      // Attempt to identify document type via path
-      if (host === 'docs.google.com') {
-        if (urlObj.pathname.includes('/document/')) return 'Google Doc';
-        if (urlObj.pathname.includes('/spreadsheets/')) return 'Google Sheet';
-        if (urlObj.pathname.includes('/presentation/')) return 'Google Slides';
-      }
-      
-      return host;
-    } catch {
-      return url; // fallback
-    }
-  };
-
-  const formatHref = (url: string) => url.startsWith('http') ? url : `https://${url}`;
 
   return (
     <div className="flex flex-wrap gap-1.5 items-center w-full min-h-[28px]">

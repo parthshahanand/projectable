@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
 import { useData } from '@/lib/data-context';
 
-export function NewReportDialog() {
+export function NewProjectPopover() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,21 +34,20 @@ export function NewReportDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full mt-4 text-muted-foreground hover:text-foreground border-dashed bg-transparent border-border-light shadow-none">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full mt-4 text-muted-foreground hover:text-foreground hover:bg-amber-100/50 border-dashed bg-transparent border-border-light shadow-none">
           <Plus className="w-4 h-4 mr-2" /> New Project
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
-            <DialogDescription className="hidden">Create a new project and specify the number of reports.</DialogDescription>
-          </DialogHeader>
-          <div className="py-6">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed mb-3 block">
-              How many reports does this project contain?
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-4 shadow-xl" align="center" side="top" sideOffset={8}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="space-y-1">
+            <h4 className="font-semibold leading-none">Create New Project</h4>
+          </div>
+          <div className="flex flex-col gap-3">
+            <label className="text-sm font-medium leading-none">
+              How many reports does it contain?
             </label>
             <Input 
               type="number" 
@@ -59,12 +58,12 @@ export function NewReportDialog() {
               autoFocus
             />
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>Create {count} {parseInt(count) === 1 ? 'Report' : 'Reports'}</Button>
-          </DialogFooter>
+          <div className="flex justify-end gap-2 mt-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" size="sm" disabled={isSubmitting}>Create</Button>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 }

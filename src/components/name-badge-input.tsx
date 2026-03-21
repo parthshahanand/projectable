@@ -10,7 +10,8 @@ interface NameBadgeInputProps {
   availableSuggestions: string[];
   placeholder?: string;
   className?: string;
-  theme?: 'blue' | 'amber' | 'gray';
+  theme?: 'blue' | 'rose' | 'gray';
+  openUpwards?: boolean;
 }
 
 export function NameBadgeInput({ 
@@ -19,7 +20,8 @@ export function NameBadgeInput({
   availableSuggestions, 
   placeholder = "Add...", 
   className = "",
-  theme = 'gray'
+  theme = 'gray',
+  openUpwards = false
 }: NameBadgeInputProps) {
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -61,9 +63,9 @@ export function NameBadgeInput({
           key={name} 
           variant="secondary" 
           className={cn(
-            "px-2 py-0.5 text-[11px] font-medium border transition-colors flex items-center gap-1",
-            theme === 'blue' && "bg-[var(--blue-3)] text-[var(--blue-11)] border-[var(--blue-7)] hover:bg-[var(--blue-4)]",
-            theme === 'amber' && "bg-[var(--amber-3)] text-[var(--amber-11)] border-[var(--amber-7)] hover:bg-[var(--amber-4)]",
+            "px-2 py-0.5 text-xs font-medium border transition-colors flex items-center gap-1",
+            theme === 'blue' && "bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-200",
+            theme === 'rose' && "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200",
             theme === 'gray' && "bg-secondary text-secondary-foreground"
           )}
         >
@@ -94,11 +96,14 @@ export function NameBadgeInput({
         className="flex-1 min-w-[60px] bg-transparent border-none outline-none text-sm p-1"
       />
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 z-50 w-full max-w-[200px] mt-1 bg-popover border rounded-md shadow-md py-1">
+        <div className={cn(
+          "absolute z-50 w-full left-0 bg-background border border-border shadow-md rounded-md max-h-48 overflow-auto",
+          openUpwards ? "bottom-full mb-1" : "top-full mt-1"
+        )}>
           {suggestions.slice(0, 5).map(suggestion => (
             <button
               key={suggestion}
-              className="w-full text-left px-3 py-1.5 text-sm hover:bg-muted"
+              className="w-full text-left px-3 py-1.5 text-sm hover:bg-amber-100/50"
               onMouseDown={(e) => {
                 e.preventDefault(); // Prevent blur
                 addName(suggestion);

@@ -22,6 +22,7 @@ interface DataContextType {
   deleteProject: (id: string) => Promise<void>;
   deleteReport: (id: string) => Promise<void>;
   createProject: (options: CreateProjectOptions) => Promise<Project | null>;
+  addReportsToProject: (projectId: string, count: number) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -155,8 +156,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return project as Project;
   };
 
+  const addReportsToProject = async (projectId: string, count: number) => {
+    const projectReports = reports.filter(r => r.project_id === projectId);
+    const maxOrder = projectReports.length > 0 ? Math.max(...projectReports.map(r => r.order)) : -1;
+
+    const reportsToInsert = Array.from({ length: count }).map((_, i) => ({
+      project_id: projectId,
+      name: `Report ${projectReports.length + i + 1}`,
+      due_date: null,
+      order: maxOrder + 1 + i,
+    }));
+
+    const { error: reportError } = await supabase.from('reports').insert(reportsToInsert);
+    if (reportError) {
+      toast.error('Failed to add reports');
+    }
+  };
+
   return (
-    <DataContext.Provider value={{ projects, reports, allOwners, allAccounts, isLoading, updateProject, updateReport, deleteProject, deleteReport, createProject }}>
+    <DataContext.Provider value={{ projects, reports, allOwners, allAccounts, isLoading, updateProject, updateReport, deleteProject, deleteReport, createProject, addReportsToProject }}>
       {children}
     </DataContext.Provider>
   );

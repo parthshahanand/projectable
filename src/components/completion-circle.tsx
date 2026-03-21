@@ -7,7 +7,8 @@ import { Report } from '@/types';
 export function CompletionCircle({ report, className }: { report: Report; className?: string }) {
   const { updateReport } = useData();
 
-  const toggleComplete = async () => {
+  const toggleComplete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     await updateReport(report.id, { completed: !report.completed });
   };
 

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useData } from '@/lib/data-context';
 import { ReportRow } from './report-row';
-import { NewReportDialog } from './new-report-dialog';
+import { NewProjectPopover } from './new-project-popover';
 import { ArchivedTable } from './archived-table';
 
 export function ProjectTable() {
@@ -65,7 +65,7 @@ export function ProjectTable() {
         )}
       </div>
       
-      <NewReportDialog />
+      <NewProjectPopover />
       <ArchivedTable />
     </div>
   );
