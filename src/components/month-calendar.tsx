@@ -78,15 +78,16 @@ export function MonthCalendar() {
         <h2 className="text-[1.1rem] font-semibold tracking-tight text-foreground">
           {visibleMonth}
         </h2>
-        <button onClick={handleToday} className="text-xs px-3 py-1.5 bg-muted/60 text-muted-foreground font-medium rounded-sm hover:bg-muted/80 transition-colors">
+        <button onClick={handleToday} className="text-xs px-3 py-1.5 bg-background border border-stone-300 text-foreground font-medium rounded-sm hover:bg-amber-100/50 transition-colors">
           Today
         </button>
       </div>
       
-      <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative pr-4">
-        <div className="grid grid-cols-7 w-full h-max border-t border-l border-border-light auto-rows-[minmax(120px,1fr)]">
-          {/* Header row for days of week */}
-          <div className="col-span-7 grid grid-cols-7 sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">
+      <div className="flex-1 border border-border-light rounded-lg overflow-hidden flex flex-col min-h-0 relative mb-4 mr-4">
+        <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative bg-background">
+          <div className="grid grid-cols-7 w-full h-max auto-rows-[minmax(120px,1fr)]">
+            {/* Header row for days of week */}
+            <div className="col-span-7 grid grid-cols-7 sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
               <div key={day} className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider flex items-center justify-center border-r border-border-light last:border-r-0 h-full">
                 {day}
@@ -121,6 +122,7 @@ export function MonthCalendar() {
           })}
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -34,6 +34,7 @@ export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isL
           availableSuggestions={allOwners}
           placeholder="Add owner..."
           theme="blue"
+          openUpwards={isLastProject}
         />
       </td>
       <td rowSpan={rowSpan} className={`p-2 border-border-light border-r align-top text-sm ${!isLastProject ? 'border-b' : ''}`}>
@@ -42,7 +43,8 @@ export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isL
           onChange={handleAccountsChange}
           availableSuggestions={allAccounts}
           placeholder="Add account..."
-          theme="amber"
+          theme="rose"
+          openUpwards={isLastProject}
         />
       </td>
       <td rowSpan={rowSpan} className={`p-2 border-border-light align-top text-sm ${!isLastProject ? 'border-b' : 'rounded-br-lg'}`}>

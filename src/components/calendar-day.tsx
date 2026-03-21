@@ -4,7 +4,7 @@ import { Report } from '@/types';
 import { CalendarBadge } from './calendar-badge';
 import { useData } from '@/lib/data-context';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -68,10 +68,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
 
   return (
     <div 
-      className={cn(
-        "flex-1 border-r border-border-light flex flex-col min-w-[30px] w-full h-full relative transition-colors cursor-pointer",
-        isToday ? "bg-calendar-today/30" : "hover:bg-muted/30"
-      )}
+      className="flex-1 border-r border-border-light flex flex-col min-w-[30px] w-full h-full relative transition-colors cursor-pointer hover:bg-amber-100/25"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isAdding) {
           setIsAdding(true);
@@ -88,7 +85,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
           "text-sm font-medium h-6 mx-auto flex items-center justify-center transition-colors",
           !hideDayOfWeek && "mt-0.5",
           monthLabel || isToday ? "px-2.5 rounded-full w-max" : "w-6 rounded-full",
-          isToday ? "bg-primary text-primary-foreground" : (monthLabel ? "bg-muted/60 text-muted-foreground text-xs" : "text-foreground")
+          isToday ? "bg-primary text-primary-foreground" : (monthLabel ? "bg-muted/30 border border-border text-muted-foreground text-xs" : "text-foreground")
         )}>
           {monthLabel || date.format('D')}
         </div>
@@ -103,64 +100,68 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
         ))}
         
         {isAdding && (
-          <input
-            autoFocus
-            type="text"
-            className="w-full text-xs p-1 px-1.5 bg-background border border-border focus:outline-none focus:ring-1 ring-primary rounded-sm shadow-sm"
-            placeholder="Name..."
-            value={newReportName}
-            onChange={e => setNewReportName(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={(e) => {
-              // Only trigger submit if they didn't clear it.
-              // We check relatedTarget to see if focus moved to the dialog (which means dialog is opening)
-              const newFocus = e.relatedTarget as HTMLElement;
-              const isMovingToDialog = newFocus?.closest('[role="dialog"]');
-              
-              if (!isMovingToDialog) {
-                setTimeout(() => {
-                  // Only submit if name is not empty
-                  if (newReportName.trim() !== '') {
-                    handleInlineSubmit();
-                  } else {
-                    setIsAdding(false);
+          <Popover open={showCountDialog} onOpenChange={(open) => {
+            if (!open && !isSubmitting) setShowCountDialog(false);
+          }}>
+            <PopoverTrigger asChild>
+              <input
+                autoFocus
+                type="text"
+                className="w-full text-xs p-1 px-1.5 bg-background border border-border focus:outline-none focus:ring-1 ring-primary rounded-sm shadow-sm relative z-10"
+                placeholder="Name..."
+                value={newReportName}
+                onChange={e => setNewReportName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={(e) => {
+                  const newFocus = e.relatedTarget as HTMLElement;
+                  const isMovingToPopover = newFocus?.closest('[role="dialog"]');
+                  
+                  if (!isMovingToPopover) {
+                    setTimeout(() => {
+                      if (newReportName.trim() !== '') {
+                        handleInlineSubmit();
+                      } else {
+                        setIsAdding(false);
+                      }
+                    }, 100);
                   }
-                }, 100);
-              }
-            }}
-          />
+                }}
+              />
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-72 p-4 shadow-xl" 
+              align="start" 
+              side="bottom"
+              sideOffset={4}
+              onClick={(e) => e.stopPropagation()}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <form onSubmit={handleCreateProject} className="flex flex-col gap-4">
+                <div className="space-y-1">
+                  <h4 className="font-semibold leading-none">Create New Project</h4>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium leading-none">
+                    How many reports does it contain?
+                  </label>
+                  <Input 
+                    type="number" 
+                    min="1" 
+                    max="100" 
+                    value={reportCount} 
+                    onChange={e => setReportCount(e.target.value)} 
+                    autoFocus
+                  />
+                </div>
+                <div className="flex justify-end gap-2 mt-2">
+                  <Button type="button" variant="outline" size="sm" onClick={() => { setShowCountDialog(false); setIsAdding(false); setNewReportName(''); }}>Cancel</Button>
+                  <Button type="submit" size="sm" disabled={isSubmitting}>Create</Button>
+                </div>
+              </form>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
-
-      <Dialog open={showCountDialog} onOpenChange={(open) => {
-        if (!open && !isSubmitting) setShowCountDialog(false);
-      }}>
-        <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
-          <form onSubmit={handleCreateProject}>
-            <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription className="hidden">Create a new inline project and specify the number of reports.</DialogDescription>
-            </DialogHeader>
-            <div className="py-6">
-              <label className="text-sm font-medium leading-none mb-3 block">
-                How many reports does this project contain?
-              </label>
-              <Input 
-                type="number" 
-                min="1" 
-                max="100" 
-                value={reportCount} 
-                onChange={e => setReportCount(e.target.value)} 
-                autoFocus
-              />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowCountDialog(false)}>Cancel</Button>
-              <Button type="submit" disabled={isSubmitting}>Create {reportCount} {parseInt(reportCount) === 1 ? 'Report' : 'Reports'}</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

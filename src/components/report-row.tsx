@@ -42,7 +42,7 @@ export const ReportRow = React.memo(function ReportRow({
   };
 
   return (
-    <tr className="group hover:bg-muted/30 transition-colors">
+    <tr className="group hover:bg-amber-100/25 transition-colors">
       <td className={cn("p-2 border-border-light border-r w-[120px]", !isLastOfAll && "border-b", isLastOfAll && "rounded-bl-lg")}>
         <Popover open={dateOpen} onOpenChange={setDateOpen}>
           <PopoverTrigger asChild>
