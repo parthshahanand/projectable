@@ -2,7 +2,8 @@ import React from 'react';
 import { Project } from '@/types';
 import { NameBadgeInput } from './name-badge-input';
 import { LinkBadgeInput } from './link-badge-input';
-import { useData } from '@/lib/data-context';
+import { useDataState, useDataActions } from '@/lib/data-context';
+import { cn } from '@/lib/utils';
 
 interface MergedCellProps {
   project: Project;
@@ -11,7 +12,8 @@ interface MergedCellProps {
 }
 
 export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isLastProject }: MergedCellProps) {
-  const { allOwners, allAccounts, updateProject } = useData();
+  const { allOwners, allAccounts } = useDataState();
+  const { updateProject } = useDataActions();
 
   const handleOwnersChange = (newOwners: string[]) => {
     updateProject(project.id, { owners: newOwners });
@@ -27,7 +29,7 @@ export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isL
 
   return (
     <>
-      <td rowSpan={rowSpan} className={`p-2 border-border-light border-r align-top text-sm relative ${!isLastProject ? 'border-b' : ''}`}>
+      <td rowSpan={rowSpan} className="p-2 border-border-light border-r border-b align-top text-sm relative">
         <NameBadgeInput
           names={project.owners || []}
           onChange={handleOwnersChange}
@@ -37,7 +39,7 @@ export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isL
           openUpwards={isLastProject}
         />
       </td>
-      <td rowSpan={rowSpan} className={`p-2 border-border-light border-r align-top text-sm ${!isLastProject ? 'border-b' : ''}`}>
+      <td rowSpan={rowSpan} className="p-2 border-border-light border-r border-b align-top text-sm">
         <NameBadgeInput
           names={project.accounts || []}
           onChange={handleAccountsChange}
@@ -47,7 +49,7 @@ export const MergedCell = React.memo(function MergedCell({ project, rowSpan, isL
           openUpwards={isLastProject}
         />
       </td>
-      <td rowSpan={rowSpan} className={`p-2 border-border-light align-top text-sm ${!isLastProject ? 'border-b' : 'rounded-br-lg'}`}>
+      <td rowSpan={rowSpan} className={cn("p-2 border-border-light border-b align-top text-sm", isLastProject && "rounded-br-lg")}>
         <LinkBadgeInput
           links={project.files || []}
           onChange={handleFilesChange}

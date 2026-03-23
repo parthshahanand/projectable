@@ -5,7 +5,7 @@ import { Report } from '@/types';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { useData } from '@/lib/data-context';
+import { useDataActions } from '@/lib/data-context';
 import { ReportActions } from './report-actions';
 
 import { MergedCell } from './merged-cell';
@@ -28,7 +28,7 @@ export const ReportRow = React.memo(function ReportRow({
   project, 
   isLastProject 
 }: ReportRowProps) {
-  const { updateReport } = useData();
+  const { updateReport } = useDataActions();
   const [dateOpen, setDateOpen] = useState(false);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +43,7 @@ export const ReportRow = React.memo(function ReportRow({
 
   return (
     <tr className="group hover:bg-amber-100/25 transition-colors">
-      <td className={cn("p-2 border-border-light border-r w-[120px]", !isLastOfAll && "border-b", isLastOfAll && "rounded-bl-lg")}>
+      <td className={cn("p-2 border-border-light border-r border-b w-[120px]", isLastOfAll && "rounded-bl-lg")}>
         <Popover open={dateOpen} onOpenChange={setDateOpen}>
           <PopoverTrigger asChild>
             <button className={cn(
@@ -65,7 +65,7 @@ export const ReportRow = React.memo(function ReportRow({
           </PopoverContent>
         </Popover>
       </td>
-      <td className={cn("p-2 border-border-light border-r min-w-[200px] relative group/name", !isLastOfAll && "border-b")}>
+      <td className={cn("p-2 border-border-light border-r border-b relative group/name")}>
         <div className="flex justify-between items-center h-full w-full">
           <input 
             type="text" 
@@ -74,7 +74,7 @@ export const ReportRow = React.memo(function ReportRow({
             placeholder="Report name..."
             className={cn(
               "w-full bg-transparent border-none outline-none focus:ring-1 ring-border rounded-sm p-1.5 pl-1.5 text-sm transition-all",
-              report.completed && "line-through text-success-text"
+              report.completed && "line-through text-success-text opacity-70"
             )}
           />
           <ReportActions report={report} reportCount={reportCount} />

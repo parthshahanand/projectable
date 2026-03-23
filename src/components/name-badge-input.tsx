@@ -90,7 +90,10 @@ export function NameBadgeInput({
           setIsOpen(true);
         }}
         onFocus={() => setIsOpen(true)}
-        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+        onBlur={() => {
+          if (input.trim()) addName(input);
+          setTimeout(() => setIsOpen(false), 200);
+        }}
         onKeyDown={handleKeyDown}
         placeholder={names.length === 0 ? placeholder : ''}
         className="flex-1 min-w-[60px] bg-transparent border-none outline-none text-sm p-1"

@@ -15,6 +15,7 @@ export interface Report {
   order: number;
   notes: string | null;
   archived: boolean;
+  color: string | null;
   created_at: string;
 }
 

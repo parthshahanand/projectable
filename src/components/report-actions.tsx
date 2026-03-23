@@ -12,8 +12,9 @@ import {
   Plus
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useData } from '@/lib/data-context';
+import { useReportOperations } from '@/lib/use-report-operations';
 import { Report } from '@/types';
 import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
@@ -57,12 +58,24 @@ const ActionItem = ({
 );
 
 export function ReportActions({ report, reportCount }: ReportActionsProps) {
-  const { updateReport, deleteReport, deleteProject, addReportsToProject } = useData();
+  const { 
+    isEditingNote,
+    setIsEditingNote,
+    noteInput,
+    setNoteInput,
+    isAddingReports,
+    setIsAddingReports,
+    addCountInput,
+    setAddCountInput,
+    handleToggleComplete,
+    handleToggleArchive,
+    handleSaveNote,
+    handleAddReports,
+    handleDelete,
+    handleArchiveProject
+  } = useReportOperations(report);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteInput, setNoteInput] = useState(report.notes || '');
-  const [isAddingReports, setIsAddingReports] = useState(false);
-  const [addCountInput, setAddCountInput] = useState('1');
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -71,36 +84,6 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
       setNoteInput(report.notes || '');
       setIsAddingReports(false);
       setAddCountInput('1');
-    }
-  };
-
-  const handleSaveNote = async () => {
-    await updateReport(report.id, { notes: noteInput.trim() || null });
-    setIsEditingNote(false);
-  };
-
-  const handleAddReports = async () => {
-    const num = parseInt(addCountInput);
-    if (isNaN(num) || num < 1 || num > 100) return;
-    await addReportsToProject(report.project_id, num);
-    setIsOpen(false);
-    setIsAddingReports(false);
-    setAddCountInput('1');
-  };
-
-  const handleToggleComplete = async () => {
-    await updateReport(report.id, { completed: !report.completed });
-  };
-
-  const handleToggleArchive = async () => {
-    await updateReport(report.id, { archived: !report.archived });
-  };
-
-  const handleDelete = async () => {
-    if (reportCount === 1) {
-      await deleteProject(report.project_id);
-    } else {
-      await deleteReport(report.id);
     }
   };
 
@@ -193,16 +176,17 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
                   className="h-8 text-sm py-1 bg-white focus:ring-1"
                   autoFocus
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddReports();
+                    if (e.key === 'Enter') handleAddReports(report.project_id, parseInt(addCountInput));
                     if (e.key === 'Escape') setIsAddingReports(false);
                   }}
                 />
-                <button
-                  onClick={handleAddReports}
-                  className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                <Button 
+                  size="sm" 
+                  onClick={() => handleAddReports(report.project_id, parseInt(addCountInput))}
+                  disabled={parseInt(addCountInput) < 1}
                 >
                   Add
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -219,11 +203,22 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
             onClick={handleToggleArchive}
           />
           
-          <ActionItem 
-            icon={Trash2} 
-            label="Delete Permanently" 
-            onClick={handleDelete}
+          {reportCount > 1 && !report.archived && (
+            <ActionItem 
+              icon={Archive} 
+              label="Archive Entire Project" 
+              onClick={handleArchiveProject}
+            />
+          )}
+          
+          <ActionItem
+            icon={Trash2}
+            label="Delete Report"
             destructive
+            onClick={() => {
+              handleDelete(reportCount);
+              setIsOpen(false);
+            }}
           />
         </div>
       </PopoverContent>

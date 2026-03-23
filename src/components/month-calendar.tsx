@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
-import { useData } from '@/lib/data-context';
+import { useDataState } from '@/lib/data-context';
 import { CalendarDay } from './calendar-day';
 import { Report } from '@/types';
 
 export function MonthCalendar() {
-  const { reports } = useData();
+  const { reports } = useDataState();
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLDivElement>(null);
   const [visibleMonth, setVisibleMonth] = useState(dayjs().format('MMMM YYYY'));
