@@ -3,12 +3,12 @@
 import { AppHeader } from '@/components/app-header';
 import { ProjectTable } from '@/components/project-table';
 import { MonthCalendar } from '@/components/month-calendar';
-import { useData } from '@/lib/data-context';
+import { useDataState } from '@/lib/data-context';
 import { Loader2 } from 'lucide-react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 export default function Home() {
-  const { isLoading } = useData();
+  const { isLoading } = useDataState();
 
   if (isLoading) {
     return (
@@ -25,7 +25,7 @@ export default function Home() {
       <ResizablePanelGroup orientation="horizontal" className="flex-1 min-h-0 overflow-hidden">
         {/* Left pane: Table */}
         <ResizablePanel defaultSize={40} minSize={20}>
-          <div className="overflow-y-auto h-full pr-2 pb-20 relative">
+          <div className="overflow-auto h-full pr-2 pb-20 relative">
             <ProjectTable />
           </div>
         </ResizablePanel>

@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useData } from '@/lib/data-context';
+import { useDataState, useDataActions } from '@/lib/data-context';
 import { ArchiveRestore, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import dayjs from 'dayjs';
+import { cn } from '@/lib/utils';
 
 export function ArchivedTable() {
-  const { reports, projects, updateReport, deleteReport, deleteProject } = useData();
+  const { reports, projects } = useDataState();
+  const { updateReport, deleteReport, deleteProject } = useDataActions();
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const archivedReports = reports.filter(r => r.archived);
@@ -27,7 +29,7 @@ export function ArchivedTable() {
   };
 
   return (
-    <div className="mt-24 space-y-4">
+    <div className="mt-8 space-y-4">
       <button 
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="flex items-center gap-2 px-1 group w-full"
@@ -57,7 +59,7 @@ export function ArchivedTable() {
                   </td>
                   <td className="px-3 py-2 text-xs font-medium text-foreground border-r border-border-light/50">
                     <div className="flex flex-col">
-                      <span>{report.name}</span>
+                      <span className={cn(report.completed && "line-through text-success-text opacity-70")}>{report.name}</span>
                       {project && (
                         <span className="text-[10px] text-muted-foreground/60 font-normal">
                           {project.owners?.join(', ') || 'Unassigned'}

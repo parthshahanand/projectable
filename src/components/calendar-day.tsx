@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { Report } from '@/types';
 import { CalendarBadge } from './calendar-badge';
-import { useData } from '@/lib/data-context';
+import { useDataActions } from '@/lib/data-context';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
   const [showCountDialog, setShowCountDialog] = useState(false);
   const [reportCount, setReportCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createProject } = useData();
+  const { createProject } = useDataActions();
 
   const handleInlineSubmit = () => {
     if (!newReportName.trim()) {
