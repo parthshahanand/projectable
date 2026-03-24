@@ -54,7 +54,7 @@
   --color-success-bg: var(--color-green-100);
   --color-success-text: var(--color-green-700);
   --color-calendar-today: var(--color-blue-100);
-  --color-border-light: var(--color-slate-200);
+  --color-border-light: oklch(0.88 0 0);
 }
 
 :root {
@@ -71,9 +71,9 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.82 0 0);
+  --input: oklch(0.82 0 0);
+  --ring: oklch(0.62 0 0);
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
@@ -86,9 +86,9 @@
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-border: oklch(0.82 0 0);
+  --sidebar-ring: oklch(0.62 0 0);
+  --sidebar-ring: oklch(0.62 0 0);
   --background: var(--color-amber-50);
   --foreground: var(--color-stone-950);
 }

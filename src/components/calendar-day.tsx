@@ -107,7 +107,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
               <input
                 autoFocus
                 type="text"
-                className="w-full text-xs p-1 px-1.5 bg-background border border-border focus:outline-none focus:ring-1 ring-primary rounded-sm shadow-sm relative z-10"
+                className="w-full text-xs p-1 px-1.5 bg-white border border-border focus:outline-none focus:ring-1 ring-primary rounded-sm shadow-sm relative z-10"
                 placeholder="Name..."
                 value={newReportName}
                 onChange={e => setNewReportName(e.target.value)}
