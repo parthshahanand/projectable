@@ -22,26 +22,9 @@ import { useReportOperations } from '@/lib/use-report-operations';
 import { Report, Project } from '@/types';
 import { cn } from '@/lib/utils';
 import { formatDisplay, formatHref } from '@/lib/format-link';
+import { COLOR_OPTIONS, PICKER_COLOR_CLASSES, ReportColor } from '@/lib/colors';
 
-const REPORT_COLORS = [
-  { name: 'red', class: 'bg-red-500/50 border-red-500/50 hover:bg-red-500/70' },
-  { name: 'orange', class: 'bg-orange-500/50 border-orange-500/50 hover:bg-orange-500/70' },
-  { name: 'amber', class: 'bg-amber-500/50 border-amber-500/50 hover:bg-amber-500/70' },
-  { name: 'yellow', class: 'bg-yellow-500/50 border-yellow-500/50 hover:bg-yellow-500/70' },
-  { name: 'lime', class: 'bg-lime-500/50 border-lime-500/50 hover:bg-lime-500/70' },
-  { name: 'green', class: 'bg-green-500/50 border-green-500/50 hover:bg-green-500/70' },
-  { name: 'emerald', class: 'bg-emerald-500/50 border-emerald-500/50 hover:bg-emerald-500/70' },
-  { name: 'teal', class: 'bg-teal-500/50 border-teal-500/50 hover:bg-teal-500/70' },
-  { name: 'cyan', class: 'bg-cyan-500/50 border-cyan-500/50 hover:bg-cyan-500/70' },
-  { name: 'sky', class: 'bg-sky-500/50 border-sky-500/50 hover:bg-sky-500/70' },
-  { name: 'blue', class: 'bg-blue-500/50 border-blue-500/50 hover:bg-blue-500/70' },
-  { name: 'indigo', class: 'bg-indigo-500/50 border-indigo-500/50 hover:bg-indigo-500/70' },
-  { name: 'violet', class: 'bg-violet-500/50 border-violet-500/50 hover:bg-violet-500/70' },
-  { name: 'purple', class: 'bg-purple-500/50 border-purple-500/50 hover:bg-purple-500/70' },
-  { name: 'fuchsia', class: 'bg-fuchsia-500/50 border-fuchsia-500/50 hover:bg-fuchsia-500/70' },
-  { name: 'pink', class: 'bg-pink-500/50 border-pink-500/50 hover:bg-pink-500/70' },
-  { name: 'rose', class: 'bg-rose-500/50 border-rose-500/50 hover:bg-rose-500/70' },
-];
+
 
 interface ReportDetailPopoverProps {
   report: Report;
@@ -50,7 +33,7 @@ interface ReportDetailPopoverProps {
 
 export function ReportDetailPopover({ report, children }: ReportDetailPopoverProps) {
   const { updateReport } = useDataActions();
-  const { projects } = useDataState();
+  const { projects, reports } = useDataState();
   const [isOpen, setIsOpen] = useState(false);
   
   const {
@@ -71,7 +54,6 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
   } = useReportOperations(report);
 
   const project = projects.find((p: Project) => p.id === report.project_id);
-  const { reports } = useDataState();
   const reportCount = reports.filter((r: Report) => r.project_id === report.project_id).length;
 
   if (!project) return <>{children}</>;
@@ -164,16 +146,17 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
             >
               <Undo2 className="w-3 h-3 text-muted-foreground" />
             </button>
-            {REPORT_COLORS.map((color) => (
+            {COLOR_OPTIONS.map((color) => (
               <button
                 key={color.name}
                 onClick={() => updateReport(report.id, { color: color.name })}
                 className={cn(
-                  "w-5 h-5 rounded-full border transition-all hover:scale-110",
-                  color.class,
-                  report.color === color.name && "ring-2 ring-primary ring-offset-1"
+                  "w-6 h-6 rounded-full border-2 transition-all",
+                  color.pickerClass,
+                  report.color === color.name ? "border-foreground scale-110 shadow-sm" : "border-transparent hover:scale-105"
                 )}
-                title={color.name.charAt(0).toUpperCase() + color.name.slice(1)}
+                title={color.name}
+                aria-label={`Set color to ${color.name}`}
               />
             ))}
           </div>
