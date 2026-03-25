@@ -6,6 +6,7 @@ import { MonthCalendar } from '@/components/month-calendar';
 import { useDataState } from '@/lib/data-context';
 import { Loader2 } from 'lucide-react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function Home() {
   const { isLoading } = useDataState();
@@ -26,7 +27,9 @@ export default function Home() {
         {/* Left pane: Table */}
         <ResizablePanel defaultSize={40} minSize={20}>
           <div className="overflow-auto h-full pr-2 pb-20 relative">
-            <ProjectTable />
+            <ErrorBoundary name="Project Table">
+              <ProjectTable />
+            </ErrorBoundary>
           </div>
         </ResizablePanel>
 
@@ -35,7 +38,9 @@ export default function Home() {
         {/* Right pane: Calendar */}
         <ResizablePanel defaultSize={60} minSize={30}>
           <div className="h-full overflow-hidden">
-            <MonthCalendar />
+            <ErrorBoundary name="Calendar">
+              <MonthCalendar />
+            </ErrorBoundary>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
