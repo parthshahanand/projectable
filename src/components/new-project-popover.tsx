@@ -3,13 +3,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus } from 'lucide-react';
-import { useData } from '@/lib/data-context';
+import { useDataActions } from '@/lib/data-context';
 
 export function NewProjectPopover() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createProject } = useData();
+  const { createProject } = useDataActions();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

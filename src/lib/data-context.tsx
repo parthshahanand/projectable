@@ -198,13 +198,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useData = () => {
-  const state = useContext(DataStateContext);
-  const actions = useContext(DataActionsContext);
-  if (!state || !actions) throw new Error('useData must be used within a DataProvider');
-  return { ...state, ...actions };
-};
-
 export const useDataState = () => {
   const context = useContext(DataStateContext);
   if (context === undefined) throw new Error('useDataState must be used within a DataProvider');

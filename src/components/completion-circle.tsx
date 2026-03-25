@@ -1,11 +1,11 @@
 import React from 'react';
 import { Circle, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useData } from '@/lib/data-context';
+import { useDataActions } from '@/lib/data-context';
 import { Report } from '@/types';
 
 export function CompletionCircle({ report, className }: { report: Report; className?: string }) {
-  const { updateReport } = useData();
+  const { updateReport } = useDataActions();
 
   const toggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();

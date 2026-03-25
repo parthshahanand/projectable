@@ -29,10 +29,20 @@ export const ReportRow = React.memo(function ReportRow({
   isLastProject 
 }: ReportRowProps) {
   const { updateReport } = useDataActions();
+  const [localName, setLocalName] = useState(report.name || '');
+  const [prevReportName, setPrevReportName] = useState(report.name);
   const [dateOpen, setDateOpen] = useState(false);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateReport(report.id, { name: e.target.value });
+  if (report.name !== prevReportName) {
+    setPrevReportName(report.name);
+    setLocalName(report.name || '');
+  }
+
+  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const trimmedValue = e.target.value.trim();
+    if (trimmedValue !== report.name) {
+      updateReport(report.id, { name: trimmedValue });
+    }
   };
 
   const handleDateChange = (date: Date | undefined) => {
@@ -69,8 +79,14 @@ export const ReportRow = React.memo(function ReportRow({
         <div className="flex justify-between items-center h-full w-full">
           <input 
             type="text" 
-            defaultValue={report.name} 
-            onBlur={handleNameChange}
+            value={localName} 
+            onChange={(e) => setLocalName(e.target.value)}
+            onBlur={handleNameBlur}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+              }
+            }}
             placeholder="Report name..."
             className={cn(
               "w-full bg-transparent border-none outline-none focus:ring-1 ring-border rounded-sm p-1.5 pl-1.5 text-sm transition-all",

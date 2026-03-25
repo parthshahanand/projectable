@@ -9,20 +9,19 @@ import {
   Trash2, 
   Circle,
   ExternalLink,
-  Plus,
   Undo2
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useDataState, useDataActions } from '@/lib/data-context';
 import { useReportOperations } from '@/lib/use-report-operations';
 import { NoteEditor } from './note-editor';
+import { AddReportsForm } from './add-reports-form';
 import { Report, Project } from '@/types';
 import { cn } from '@/lib/utils';
 import { formatDisplay, formatHref } from '@/lib/format-link';
-import { COLOR_OPTIONS, PICKER_COLOR_CLASSES, ReportColor } from '@/lib/colors';
+import { COLOR_OPTIONS } from '@/lib/colors';
 
 
 
@@ -35,6 +34,9 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
   const { updateReport } = useDataActions();
   const { projects, reports } = useDataState();
   const [isOpen, setIsOpen] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isConfirmingArchiveProject, setIsConfirmingArchiveProject] = useState(false);
+  const [isConfirmingArchiveReport, setIsConfirmingArchiveReport] = useState(false);
   
   const {
     isEditingNote,
@@ -65,6 +67,9 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
       setNoteInput(report.notes || '');
       setIsAddingReports(false);
       setAddCountInput('1');
+      setIsConfirmingDelete(false);
+      setIsConfirmingArchiveProject(false);
+      setIsConfirmingArchiveReport(false);
     }
   };
 
@@ -76,7 +81,7 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
         </div>
       </PopoverTrigger>
       
-      <PopoverContent className="w-[300px] p-4 shadow-xl flex flex-col gap-3" align="start">
+      <PopoverContent className="w-[320px] p-4 shadow-xl flex flex-col gap-3" align="start">
         {/* Header: Name and Due Date */}
         <div>
           <h4 className={cn("font-semibold text-base leading-tight break-words", report.completed && "line-through text-success-text opacity-70")}>
@@ -139,7 +144,7 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
             <button
               onClick={() => updateReport(report.id, { color: null })}
               className={cn(
-                "w-5 h-5 rounded-full border border-border transition-all hover:scale-110 flex items-center justify-center",
+                "w-6 h-6 rounded-full border border-border transition-all hover:scale-110 flex items-center justify-center",
                 !report.color && "ring-2 ring-primary ring-offset-1"
               )}
               title="Default Color"
@@ -188,69 +193,130 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
             <span className="font-medium">{report.completed ? "Mark Incomplete" : "Mark Complete"}</span>
           </button>
           
-          {isAddingReports ? (
-            <div className="flex flex-col gap-2 px-2 py-1.5 bg-muted/40 rounded-md my-0.5" onClick={(e) => e.stopPropagation()}>
-              <label className="text-xs font-medium leading-none text-foreground">
-                How many reports to add?
-              </label>
+          <AddReportsForm
+            isAddingReports={isAddingReports}
+            setIsAddingReports={setIsAddingReports}
+            addCountInput={addCountInput}
+            setAddCountInput={setAddCountInput}
+            handleAddReports={() => handleAddReports(report.project_id, parseInt(addCountInput))}
+            showTrigger={true}
+          />
+
+          {isConfirmingArchiveReport ? (
+            <div className="flex flex-col gap-2 px-2 py-1.5 bg-muted/50 rounded-md my-0.5 border border-border" onClick={(e) => e.stopPropagation()}>
+              <p className="text-[11px] font-bold text-foreground uppercase tracking-tight">Archive this report?</p>
               <div className="flex gap-2">
-                <Input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={addCountInput}
-                  onChange={(e) => setAddCountInput(e.target.value)}
-                  className="h-8 text-sm py-1 bg-white focus:ring-1"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddReports(report.project_id, parseInt(addCountInput));
-                    if (e.key === 'Escape') setIsAddingReports(false);
-                  }}
-                />
                 <Button 
                   size="sm" 
-                  onClick={() => handleAddReports(report.project_id, parseInt(addCountInput))}
-                  disabled={parseInt(addCountInput) < 1}
+                  variant="outline" 
+                  className="h-7 text-[10px] px-3 font-bold"
+                  onClick={() => {
+                    handleToggleArchive();
+                    setIsOpen(false);
+                  }}
                 >
-                  Add
+                  Yes, Archive
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-7 text-[10px] px-3 hover:bg-muted"
+                  onClick={() => setIsConfirmingArchiveReport(false)}
+                >
+                  Cancel
                 </Button>
               </div>
             </div>
           ) : (
-            <button 
-              onClick={() => setIsAddingReports(true)}
+            <button
+              onClick={() => {
+                if (report.archived) {
+                  handleToggleArchive();
+                  setIsOpen(false);
+                } else {
+                  setIsConfirmingArchiveReport(true);
+                }
+              }}
               className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-amber-100/50 text-muted-foreground hover:text-foreground group/item"
             >
-              <Plus className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" />
-              <span className="font-medium">Add more reports</span>
+              {report.archived ? <ArchiveRestore className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" /> : <Archive className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" />}
+              <span className="font-medium">{report.archived ? "Restore to Table" : "Archive Report"}</span>
             </button>
           )}
-
-          <button
-            onClick={handleToggleArchive}
-            className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-amber-100/50 text-muted-foreground hover:text-foreground group/item"
-          >
-            {report.archived ? <ArchiveRestore className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" /> : <Archive className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" />}
-            <span className="font-medium">{report.archived ? "Restore to Table" : "Archive Report"}</span>
-          </button>
           
           {reportCount > 1 && !report.archived && (
-            <button
-              onClick={handleArchiveProject}
-              className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-amber-100/50 text-muted-foreground hover:text-foreground group/item"
-            >
-              <Archive className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" />
-              <span className="font-medium">Archive Entire Project</span>
-            </button>
+            <>
+              {isConfirmingArchiveProject ? (
+                <div className="flex flex-col gap-2 px-2 py-1.5 bg-amber-50 rounded-md my-0.5 border border-amber-200" onClick={(e) => e.stopPropagation()}>
+                  <p className="text-[11px] font-bold text-amber-700 uppercase tracking-tight">Archive all {reportCount} reports?</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-7 text-[10px] px-3 font-bold border-amber-300 text-amber-800 hover:bg-amber-100"
+                      onClick={() => {
+                        handleArchiveProject();
+                        setIsOpen(false);
+                      }}
+                    >
+                      Yes, Archive
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="h-7 text-[10px] px-3 text-amber-600 hover:bg-amber-100/50"
+                      onClick={() => setIsConfirmingArchiveProject(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsConfirmingArchiveProject(true)}
+                  className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-amber-100/50 text-muted-foreground hover:text-foreground group/item"
+                >
+                  <Archive className="w-4 h-4 text-muted-foreground group-hover/item:text-foreground" />
+                  <span className="font-medium">Archive Entire Project</span>
+                </button>
+              )}
+            </>
           )}
           
-          <button
-            onClick={() => handleDelete(reportCount)}
-            className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-destructive/10 hover:text-destructive text-destructive/80 group/item"
-          >
-            <Trash2 className="w-4 h-4 text-destructive/80 group-hover/item:text-destructive" />
-            <span className="font-medium">Delete Permanently</span>
-          </button>
+          {isConfirmingDelete ? (
+            <div className="flex flex-col gap-2 px-2 py-1.5 bg-destructive/5 rounded-md my-0.5 border border-destructive/20" onClick={(e) => e.stopPropagation()}>
+              <p className="text-[11px] font-bold text-destructive uppercase tracking-tight">Permanently delete?</p>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="destructive" 
+                  className="h-7 text-[10px] px-3 font-bold"
+                  onClick={() => {
+                    handleDelete(reportCount);
+                    setIsOpen(false);
+                  }}
+                >
+                  Yes, Delete
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-7 text-[10px] px-3 hover:bg-muted"
+                  onClick={() => setIsConfirmingDelete(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsConfirmingDelete(true)}
+              className="flex items-center gap-3 w-full px-2 py-1.5 text-sm transition-colors rounded-md text-left hover:bg-destructive/10 hover:text-destructive text-destructive/80 group/item"
+            >
+              <Trash2 className="w-4 h-4 text-destructive/80 group-hover/item:text-destructive" />
+              <span className="font-medium">Delete Permanently</span>
+            </button>
+          )}
         </div>
       </PopoverContent>
     </Popover>

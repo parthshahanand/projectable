@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { useDataState } from '@/lib/data-context';
 import { CalendarDay } from './calendar-day';
 import { Report } from '@/types';
@@ -84,6 +85,19 @@ export function MonthCalendar() {
       </div>
       
       <div className="flex-1 border border-border-light rounded-lg overflow-hidden flex flex-col min-h-0 relative mb-4 mr-4">
+        {reports.length === 0 && (
+          <div className="absolute inset-x-0 top-[120px] z-20 flex flex-col items-center justify-center pointer-events-none px-4">
+            <div className="bg-background/95 border border-stone-300 shadow-xl p-6 rounded-lg text-center max-w-[320px] backdrop-blur-sm animate-in fade-in zoom-in duration-300">
+              <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4 border border-stone-200">
+                <CalendarIcon className="w-6 h-6 text-stone-400" />
+              </div>
+              <h3 className="text-base font-semibold text-stone-900 mb-1">Your calendar is clear</h3>
+              <p className="text-sm text-stone-500 leading-relaxed">
+                There are no reports scheduled yet. Create your first project in the table to start tracking progress here.
+              </p>
+            </div>
+          </div>
+        )}
         <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative bg-background">
           <div className="grid grid-cols-7 w-full h-max auto-rows-[minmax(120px,1fr)]">
             {/* Header row for days of week */}
