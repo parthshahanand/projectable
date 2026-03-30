@@ -28,7 +28,8 @@ export function CalendarBadge({ report }: CalendarBadgeProps) {
           <CompletionCircle report={report} className="scale-[0.85] p-0" />
         </div>
         {report.notes && report.notes.trim().length > 0 && (
-          <div className="absolute -right-1 -top-1 z-10 scale-75">
+          <div className="absolute -right-1 -top-1 scale-75">
+
             <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.4)]" />
           </div>
         )}

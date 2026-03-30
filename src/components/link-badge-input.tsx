@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, X } from 'lucide-react';
-import { formatDisplay, formatHref } from '@/lib/format-link';
+import { formatDisplay, formatHref, isUrl } from '@/lib/format-link';
 
 interface LinkBadgeInputProps {
   links: string[];
@@ -30,24 +30,40 @@ export function LinkBadgeInput({ links, onChange, placeholder }: LinkBadgeInputP
 
   return (
     <div className="flex flex-wrap gap-1.5 items-center w-full min-h-[28px]">
-      {links.map(link => (
-        <span 
-          key={link} 
-          className="flex items-center gap-1.5 bg-muted/50 border border-border hover:border-border-strong text-xs pl-2 pr-6 py-1 rounded-sm max-w-full relative transition-colors"
-        >
-          <a title={link} href={formatHref(link)} target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1.5 overflow-hidden text-foreground">
-            <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-70" />
-            <span className="truncate max-w-[150px] font-medium">{formatDisplay(link)}</span>
-          </a>
-          <button 
-            type="button"
-            onClick={(e) => { e.preventDefault(); removeLink(link); }}
-            className="absolute right-1 text-muted-foreground hover:text-destructive opacity-50 hover:opacity-100 p-0.5 rounded-sm"
+      {links.map(link => {
+        const isActuallyUrl = isUrl(link);
+        return (
+          <span 
+            key={link} 
+            className="flex items-center gap-1.5 bg-muted/50 border border-border hover:border-border-strong text-xs pl-2 pr-6 py-1 rounded-sm max-w-full relative transition-colors"
           >
-            <X className="w-3 h-3" />
-          </button>
-        </span>
-      ))}
+            {isActuallyUrl ? (
+              <a 
+                title={link} 
+                href={formatHref(link)} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:underline flex items-center gap-1.5 overflow-hidden text-foreground"
+              >
+                <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-70" />
+                <span className="truncate max-w-[150px] font-medium">{formatDisplay(link)}</span>
+              </a>
+            ) : (
+              <span className="flex items-center gap-1.5 overflow-hidden text-foreground">
+                <span className="truncate max-w-[150px] font-medium">{link}</span>
+              </span>
+            )}
+            <button 
+              type="button"
+              onClick={(e) => { e.preventDefault(); removeLink(link); }}
+              className="absolute right-1 text-muted-foreground hover:text-destructive opacity-50 hover:opacity-100 p-0.5 rounded-sm"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        );
+      })}
+
       <input
         type="text"
         value={inputValue}

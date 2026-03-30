@@ -20,7 +20,8 @@ import { NoteEditor } from './note-editor';
 import { AddReportsForm } from './add-reports-form';
 import { Report, Project } from '@/types';
 import { cn } from '@/lib/utils';
-import { formatDisplay, formatHref } from '@/lib/format-link';
+import { formatDisplay, formatHref, isUrl } from '@/lib/format-link';
+
 import { COLOR_OPTIONS } from '@/lib/colors';
 
 
@@ -37,6 +38,8 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isConfirmingArchiveProject, setIsConfirmingArchiveProject] = useState(false);
   const [isConfirmingArchiveReport, setIsConfirmingArchiveReport] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   
   const {
     isEditingNote,
@@ -70,7 +73,9 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
       setIsConfirmingDelete(false);
       setIsConfirmingArchiveProject(false);
       setIsConfirmingArchiveReport(false);
+      setCopied(false);
     }
+
   };
 
   return (
@@ -84,13 +89,32 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
       <PopoverContent className="w-[320px] p-4 shadow-xl flex flex-col gap-3" align="start">
         {/* Header: Name and Due Date */}
         <div>
-          <h4 className={cn("font-semibold text-base leading-tight break-words", report.completed && "line-through text-success-text opacity-70")}>
+          <h4
+            className={cn(
+              "font-semibold text-base leading-tight break-words cursor-pointer transition-colors duration-200",
+              report.completed ? "line-through text-success-text opacity-70" : "hover:text-primary/70"
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(report.name || "Untitled");
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1000);
+            }}
+          >
             {report.name || "Untitled"}
           </h4>
-          <p className="text-sm text-muted-foreground mt-1">
-            {report.due_date ? `Due ${dayjs(report.due_date).format("MMM DD, YYYY")}` : "No due date"}
-          </p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-sm text-muted-foreground">
+              {report.due_date ? `Due ${dayjs(report.due_date).format("MMM DD, YYYY")}` : "No due date"}
+            </p>
+            {copied && (
+              <span className="text-success-text text-xs font-bold animate-in fade-in slide-in-from-right-1 duration-200">
+                Copied!
+              </span>
+            )}
+          </div>
         </div>
+
 
         {/* Project Metadata: Owners & Accounts */}
         {(project.owners?.length > 0 || project.accounts?.length > 0) && (
@@ -119,21 +143,32 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
         {/* Project Files */}
         {project.files?.length > 0 && (
           <div className="flex flex-col gap-1">
-            {project.files.map(link => (
-              <a 
-                key={link} 
-                title={link} 
-                href={formatHref(link)} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="flex items-center gap-1.5 bg-muted/50 border border-border hover:border-border-strong text-xs px-2 py-1 rounded-sm w-fit max-w-full transition-colors hover:underline text-foreground"
-              >
-                <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-70" />
-                <span className="truncate font-medium">{formatDisplay(link)}</span>
-              </a>
-            ))}
+            {project.files.map(link => {
+              const isActuallyUrl = isUrl(link);
+              return isActuallyUrl ? (
+                <a 
+                  key={link} 
+                  title={link} 
+                  href={formatHref(link)} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-1.5 bg-muted/50 border border-border hover:border-border-strong text-xs px-2 py-1 rounded-sm w-fit max-w-full transition-colors hover:underline text-foreground"
+                >
+                  <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-70" />
+                  <span className="truncate font-medium">{formatDisplay(link)}</span>
+                </a>
+              ) : (
+                <div 
+                  key={link} 
+                  className="flex items-center gap-1.5 bg-muted/50 border border-border text-xs px-2 py-1 rounded-sm w-fit max-w-full text-foreground"
+                >
+                  <span className="truncate font-medium">{link}</span>
+                </div>
+              );
+            })}
           </div>
         )}
+
 
         <div className="h-px bg-border my-1" />
 
