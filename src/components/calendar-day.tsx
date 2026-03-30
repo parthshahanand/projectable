@@ -76,6 +76,7 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
       }}
     >
       <div className="text-center py-2 pb-2 pointer-events-none">
+
         {!hideDayOfWeek && (
           <div className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider">
             {date.format('ddd')}

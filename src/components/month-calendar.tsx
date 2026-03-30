@@ -101,7 +101,7 @@ export function MonthCalendar() {
         <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative bg-background">
           <div className="grid grid-cols-7 w-full h-max auto-rows-[minmax(120px,1fr)]">
             {/* Header row for days of week */}
-            <div className="col-span-7 grid grid-cols-7 sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">
+            <div className="col-span-7 grid grid-cols-7 sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
               <div key={day} className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider flex items-center justify-center border-r border-border-light last:border-r-0 h-full">
                 {day}
