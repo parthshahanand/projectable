@@ -5,13 +5,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js_16-000000?logo=next.js&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white" alt="Vercel" />
-  <img src="https://img.shields.io/badge/shadcn/ui-000000?logo=shadcnui&logoColor=white" alt="shadcn/ui" />
+  <img src="https://img.shields.io/badge/Next.js_16-fffbeb?logo=next.js&logoColor=0c0a09" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React_19-fffbeb?logo=react&logoColor=0c0a09" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-fffbeb?logo=typescript&logoColor=0c0a09" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS_4-fffbeb?logo=tailwindcss&logoColor=0c0a09" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Supabase-fffbeb?logo=supabase&logoColor=0c0a09" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Vercel-fffbeb?logo=vercel&logoColor=0c0a09" alt="Vercel" />
+  <img src="https://img.shields.io/badge/shadcn/ui-fffbeb?logo=shadcnui&logoColor=0c0a09" alt="shadcn/ui" />
 </p>
 
 <p align="center">

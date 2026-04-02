@@ -10,6 +10,9 @@ export function MonthCalendar() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLDivElement>(null);
   const [visibleMonth, setVisibleMonth] = useState(dayjs().format('MMMM YYYY'));
+  const [isDraggingGlobal, setIsDraggingGlobal] = useState(false);
+  const scrollVelocity = useRef(0);
+  const scrollAnimationFrame = useRef<number | null>(null);
 
   // Group reports by date for O(1) lookups during render
   const reportsByDate = useMemo(() => {
@@ -63,6 +66,49 @@ export function MonthCalendar() {
     return () => observer.disconnect();
   }, [monthDays]);
 
+  const startAutoScroll = () => {
+    if (scrollAnimationFrame.current) return;
+
+    const scroll = () => {
+      if (scrollRef.current && scrollVelocity.current !== 0) {
+        scrollRef.current.scrollTop += scrollVelocity.current;
+        scrollAnimationFrame.current = requestAnimationFrame(scroll);
+      } else {
+        scrollAnimationFrame.current = null;
+      }
+    };
+    scrollAnimationFrame.current = requestAnimationFrame(scroll);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (!scrollRef.current) return;
+    
+    const rect = scrollRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const threshold = 70; // px from edge
+    const maxSpeed = 15;
+
+    if (y < threshold) {
+      // Scroll up
+      scrollVelocity.current = -maxSpeed * (1 - y / threshold);
+      startAutoScroll();
+    } else if (y > rect.height - threshold) {
+      // Scroll down
+      scrollVelocity.current = maxSpeed * (1 - (rect.height - y) / threshold);
+      startAutoScroll();
+    } else {
+      scrollVelocity.current = 0;
+    }
+  };
+
+  const handleDragEnd = () => {
+    scrollVelocity.current = 0;
+    if (scrollAnimationFrame.current) {
+      cancelAnimationFrame(scrollAnimationFrame.current);
+      scrollAnimationFrame.current = null;
+    }
+  };
+
   const handleToday = () => {
     if (scrollRef.current && todayRef.current) {
       scrollRef.current.scrollTo({
@@ -98,7 +144,24 @@ export function MonthCalendar() {
             </div>
           </div>
         )}
-        <div ref={scrollRef} className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative bg-background">
+        <div 
+          ref={scrollRef} 
+          onDragOver={handleDragOver}
+          onDragEnter={() => setIsDraggingGlobal(true)}
+          onDragLeave={(e) => {
+            // Only stop if we're leaving the container, not entering a child
+            const rect = scrollRef.current?.getBoundingClientRect();
+            if (rect && (e.clientY < rect.top || e.clientY > rect.bottom || e.clientX < rect.left || e.clientX > rect.right)) {
+              setIsDraggingGlobal(false);
+              handleDragEnd();
+            }
+          }}
+          onDrop={() => {
+            setIsDraggingGlobal(false);
+            handleDragEnd();
+          }}
+          className="flex-1 flex overflow-y-auto overflow-x-hidden min-h-0 relative bg-background"
+        >
           <div className="grid grid-cols-7 w-full h-max auto-rows-[minmax(120px,1fr)]">
             {/* Header row for days of week */}
             <div className="col-span-7 grid grid-cols-7 sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border-light h-9">
@@ -130,6 +193,7 @@ export function MonthCalendar() {
                   reports={dayReports}
                   hideDayOfWeek={true}
                   monthLabel={isFirstOfMonth ? date.format('MMM D') : undefined}
+                  isDraggingGlobal={isDraggingGlobal}
                 />
               </div>
             );

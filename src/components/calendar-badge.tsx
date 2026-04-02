@@ -11,6 +11,7 @@ interface CalendarBadgeProps {
 }
 
 export function CalendarBadge({ report }: CalendarBadgeProps) {
+  const [isDragging, setIsDragging] = React.useState(false);
 
   const badgeStyle = report.completed
     ? "bg-success-bg border-success hover:border-success-text shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
@@ -18,12 +19,29 @@ export function CalendarBadge({ report }: CalendarBadgeProps) {
       ? `${BADGE_COLOR_CLASSES[report.color as ReportColor] || "bg-muted border-border"}`
       : "bg-cyan-500/20 border-cyan-500/20 hover:bg-cyan-500/40 hover:border-cyan-500/50 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.05)]";
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('text/plain', report.id);
+    e.dataTransfer.effectAllowed = 'move';
+    // Small delay to let the browser create the drag image before we change opacity
+    setTimeout(() => setIsDragging(true), 0);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
     <ReportDetailPopover report={report}>
-      <div className={cn(
-        "group relative flex items-start gap-1 p-1.5 rounded-sm border text-[11px] leading-tight transition-all",
-        badgeStyle
-      )}>
+      <div 
+        draggable
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        className={cn(
+          "group relative flex items-start gap-1 p-1.5 rounded-sm border text-[11px] leading-tight transition-all",
+          badgeStyle,
+          isDragging && "opacity-40 cursor-grabbing shadow-none border-dashed"
+        )}
+      >
         <div className="absolute -left-[18px] top-1/2 -translate-y-1/2">
           <CompletionCircle report={report} className="scale-[0.85] p-0" />
         </div>

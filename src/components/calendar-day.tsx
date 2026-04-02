@@ -13,16 +13,18 @@ interface CalendarDayProps {
   reports: Report[];
   hideDayOfWeek?: boolean;
   monthLabel?: string;
+  isDraggingGlobal?: boolean;
 }
 
-export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: CalendarDayProps) {
+export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel, isDraggingGlobal }: CalendarDayProps) {
   const isToday = date.isSame(dayjs(), 'day');
   const [isAdding, setIsAdding] = useState(false);
   const [newReportName, setNewReportName] = useState('');
   const [showCountDialog, setShowCountDialog] = useState(false);
   const [reportCount, setReportCount] = useState('1');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createProject } = useDataActions();
+  const [isDragOver, setIsDragOver] = useState(false);
+  const { createProject, updateReport } = useDataActions();
 
   const handleInlineSubmit = () => {
     if (!newReportName.trim()) {
@@ -66,14 +68,53 @@ export function CalendarDay({ date, reports, hideDayOfWeek, monthLabel }: Calend
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const reportId = e.dataTransfer.getData('text/plain');
+    if (!reportId) return;
+
+    const newDateStr = date.format('YYYY-MM-DD');
+    
+    // Find if the report is already on this day to avoid redundant update
+    const currentReport = reports.find(r => r.id === reportId);
+    if (currentReport?.due_date === newDateStr) return;
+
+    await updateReport(reportId, { due_date: newDateStr });
+  };
+
   return (
     <div 
-      className="flex-1 border-r border-border-light flex flex-col min-w-[30px] w-full h-full relative transition-colors cursor-pointer hover:bg-amber-100/25"
+      className={cn(
+        "flex-1 border-r border-border-light flex flex-col min-w-[30px] w-full h-full relative transition-colors cursor-pointer hover:bg-amber-100/25",
+        isDragOver && "bg-primary/5 ring-2 ring-primary/30 z-10",
+        isDraggingGlobal && !isDragOver && "bg-amber-50/10 border-dashed border-primary/10"
+      )}
       onClick={(e) => {
         if (e.target === e.currentTarget && !isAdding) {
           setIsAdding(true);
         }
       }}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div className="text-center py-2 pb-2 pointer-events-none">
 
