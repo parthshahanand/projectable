@@ -60,8 +60,6 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
   const { 
     isEditingNote,
     setIsEditingNote,
-    noteInput,
-    setNoteInput,
     isAddingReports,
     setIsAddingReports,
     addCountInput,
@@ -83,7 +81,6 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
     setIsOpen(open);
     if (!open) {
       setIsEditingNote(false);
-      setNoteInput(report.notes || '');
       setIsAddingReports(false);
       setAddCountInput('1');
       setIsConfirmingDelete(false);
@@ -104,18 +101,6 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
       </PopoverTrigger>
       <PopoverContent className="w-72 p-1.5 shadow-xl" align="end">
         <div className="flex flex-col gap-0.5">
-          <NoteEditor
-            report={report}
-            isEditingNote={isEditingNote}
-            setIsEditingNote={setIsEditingNote}
-            noteInput={noteInput}
-            setNoteInput={setNoteInput}
-            handleSaveNote={handleSaveNote}
-            className="px-2 py-1"
-          />
-
-          <div className="h-px bg-border my-1.5 mx-1" />
-
           <ActionItem 
             icon={report.completed ? CircleCheckBig : Circle} 
             label={report.completed ? "Mark Incomplete" : "Mark Complete"} 
@@ -244,6 +229,16 @@ export function ReportActions({ report, reportCount }: ReportActionsProps) {
             />
           )}
         </div>
+
+        <div className="h-px bg-border my-1.5 mx-1" />
+
+        <NoteEditor
+          report={report}
+          isEditingNote={isEditingNote}
+          setIsEditingNote={setIsEditingNote}
+          handleSaveNote={handleSaveNote}
+          className="px-2 py-1"
+        />
       </PopoverContent>
     </Popover>
   );

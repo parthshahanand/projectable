@@ -12,7 +12,6 @@ export function useReportOperations(report: Report) {
   } = useDataActions();
 
   const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteInput, setNoteInput] = useState(report.notes || '');
   const [isAddingReports, setIsAddingReports] = useState(false);
   const [addCountInput, setAddCountInput] = useState('1');
 
@@ -24,9 +23,13 @@ export function useReportOperations(report: Report) {
     await updateReport(report.id, { archived: !report.archived });
   };
 
-  const handleSaveNote = async () => {
-    await updateReport(report.id, { notes: noteInput.trim() || null });
+  const handleSaveNote = (content: string | null) => {
+    // Fast UI transition: close editor immediately
     setIsEditingNote(false);
+    
+    // Background update (optimistic UI handles the state)
+    // We don't await here to keep the UI snappy
+    updateReport(report.id, { notes: content });
   };
 
   const handleAddReports = async (projectId: string, count: number) => {
@@ -50,8 +53,6 @@ export function useReportOperations(report: Report) {
   return {
     isEditingNote,
     setIsEditingNote,
-    noteInput,
-    setNoteInput,
     isAddingReports,
     setIsAddingReports,
     addCountInput,

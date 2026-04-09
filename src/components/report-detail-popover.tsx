@@ -44,8 +44,6 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
   const {
     isEditingNote,
     setIsEditingNote,
-    noteInput,
-    setNoteInput,
     isAddingReports,
     setIsAddingReports,
     addCountInput,
@@ -67,7 +65,6 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
     setIsOpen(open);
     if (!open) {
       setIsEditingNote(false);
-      setNoteInput(report.notes || '');
       setIsAddingReports(false);
       setAddCountInput('1');
       setIsConfirmingDelete(false);
@@ -201,17 +198,6 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
             ))}
           </div>
         </div>
-
-        <div className="h-px bg-border my-1" />
-
-        <NoteEditor
-          report={report}
-          isEditingNote={isEditingNote}
-          setIsEditingNote={setIsEditingNote}
-          noteInput={noteInput}
-          setNoteInput={setNoteInput}
-          handleSaveNote={handleSaveNote}
-        />
 
         <div className="h-px bg-border my-1" />
 
@@ -353,6 +339,15 @@ export function ReportDetailPopover({ report, children }: ReportDetailPopoverPro
             </button>
           )}
         </div>
+
+        <div className="h-px bg-border my-1" />
+
+        <NoteEditor
+          report={report}
+          isEditingNote={isEditingNote}
+          setIsEditingNote={setIsEditingNote}
+          handleSaveNote={handleSaveNote}
+        />
       </PopoverContent>
     </Popover>
   );
