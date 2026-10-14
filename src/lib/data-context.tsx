@@ -5,7 +5,7 @@ import { Project, Report } from '@/types';
 import { supabase } from './supabase';
 import { toast } from 'sonner';
 
-interface CreateProjectOptions {
+export interface CreateProjectOptions {
   reportCount: number;
   name?: string;
   dueDate?: string | null;
@@ -19,7 +19,7 @@ interface DataStateContextType {
   isLoading: boolean;
 }
 
-interface DataActionsContextType {
+export interface DataActionsContextType {
   updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   updateReport: (id: string, updates: Partial<Report>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
@@ -29,8 +29,8 @@ interface DataActionsContextType {
   archiveProject: (projectId: string, archive?: boolean) => Promise<void>;
 }
 
-const DataStateContext = createContext<DataStateContextType | undefined>(undefined);
-const DataActionsContext = createContext<DataActionsContextType | undefined>(undefined);
+export const DataStateContext = createContext<DataStateContextType | undefined>(undefined);
+export const DataActionsContext = createContext<DataActionsContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>([]);
